@@ -62,6 +62,15 @@ export const LoginWithAccessCode = () => {
           position: "bottom-center",
           theme: "colored",
         });
+
+        // Storing user ID in local storage
+        const { _id, role } = response.data;
+        const userObject = {
+          id: _id,
+          role: role,
+        };
+        localStorage.removeItem("user");
+        localStorage.setItem("user", JSON.stringify(userObject));
       }
     } catch (error: any) {
       console.error("Error logging in: ", error);

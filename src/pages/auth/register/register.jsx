@@ -16,8 +16,10 @@ import { PasswordInputComponent } from "../../../components/password-input";
 import { PasswordStrength } from "../../../components/password-strength";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {validateEmail} from '../../../helpers'
 import axios from "axios";
+
 
 export const Register = () => {
   const [name, setName] = useState("");
@@ -42,11 +44,6 @@ export const Register = () => {
       specialCharRegex.test(password) &&
       password.length >= 6;
 
-    const validateEmail = (email) => {
-      const validation = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-
-      return validation.test(email);
-    };
 
     if (!name || !email || !password) {
       toast.error(

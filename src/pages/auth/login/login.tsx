@@ -67,6 +67,15 @@ export const Login = () => {
         setPassword("");
         setIsLoading(false);
         setIsLoggedIn(true);
+
+        // Storing user ID in local storage
+        const { _id, role } = response.data;
+        const userObject = {
+          id: _id,
+          role: role,
+        };
+        localStorage.removeItem("user");
+        localStorage.setItem("user", JSON.stringify(userObject));
       }
     } catch (error: any) {
       console.error("Login Error: ", error);

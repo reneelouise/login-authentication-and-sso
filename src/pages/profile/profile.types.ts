@@ -4,6 +4,5 @@ export interface ProfileProps {
   phone: string;
   bio: string;
   photo: string;
-  role: string;
-  isVerified: boolean;
+  role?: string;
 }
