@@ -1,0 +1,11 @@
+export { Home } from "./home";
+export { Login } from "./auth/login/login";
+export { ForgotPassword } from "./auth/forgot-password/forgot-password.component";
+export { Register } from "./auth/register/register";
+export { Dashboard } from "./dashboard";
+export { ResetPassword } from "./auth/reset-password/reset-password.component";
+export { LoginWithAccessCode } from "./auth/login-with-access-code/login-with-code.component";
+export { Profile } from "./profile/profile.component";
+export { VerifyAccount } from "./auth/verify/verify.component";
+export { ChangePassword } from "./change-password/change-password.component";
+export { UserList } from "./user-list/user-list.component";
