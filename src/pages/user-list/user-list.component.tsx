@@ -10,27 +10,28 @@ import {
   TableRow,
   TableData,
 } from "./user-list.styles";
-import { ProfileMenu } from "../../components/profile-menu";
 import { Card } from "../../components/stats-card";
 import { FaUsers } from "react-icons/fa6";
 import { BiUserCheck, BiUserMinus, BiSolidUserX } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "./user-list.types";
+import { toast } from "react-toastify";
 
 interface UserListProps {
   isLoggedIn: boolean;
   id: string;
+  role: string;
 }
 
-export const UserList = ({ isLoggedIn, id }: UserListProps) => {
+export const UserList = ({ isLoggedIn, role, id }: UserListProps) => {
   const [users, setUsers] = useState<User[]>([]);
-
-  const BASE_URL = process.env.BACKEND_URL;
 
   const getAllUsers = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/register`);
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/register`
+      );
       setUsers(response.data);
       console.log("response: ", response);
     } catch (error) {
@@ -41,13 +42,20 @@ export const UserList = ({ isLoggedIn, id }: UserListProps) => {
   const verifiedUsers = users.filter((user) => user.isVerified);
   const unverifiedUsers = users.filter((user) => !user.isVerified);
 
-  useEffect(() => {
+useEffect(() => {
+  if (isLoggedIn && (role === "admin" || role === "author")) {
     getAllUsers();
-  }, []);
+  } else {
+    toast.error("Permission denied", {
+      position: "bottom-center",
+      theme: "colored",
+    });
+  }
+}, [isLoggedIn, role]);
+
 
   return (
     <Container>
-      <ProfileMenu isLoggedIn={isLoggedIn} id={id} />
       <Heading>Stats</Heading>
       <StatsContainer>
         <Card

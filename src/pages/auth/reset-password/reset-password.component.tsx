@@ -6,6 +6,7 @@ import { PasswordStrength } from "../../../components/password-strength";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { useParams } from "react-router-dom";
 
 export const ResetPassword = () => {
   const [oldPassword, setOldPassword] = useState<string>("");
@@ -14,6 +15,8 @@ export const ResetPassword = () => {
   const [isReset, setIsReset] = useState<boolean>(false);
 
   const navigate = useNavigate();
+
+  const resetToken = useParams()
 
   const resetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,7 +37,7 @@ export const ResetPassword = () => {
 
     try {
       const response = await axios.patch(
-        "http://localhost:5000/api/change-password",
+        `${process.env.REACT_APP_BACKEND_URL}/api/reset-password/${resetToken}`,
         {
           oldPassword: oldPassword.trim(),
           password: password.trim(),

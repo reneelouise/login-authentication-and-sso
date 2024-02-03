@@ -12,16 +12,23 @@ import {
   PlainButton,
 } from "./login-with-code.styles";
 import { toast } from "react-toastify";
+import { IUser } from "../../../helpers";
 
 interface LoginWithAccessCodeProps {
   isLoggedIn: boolean;
   setIsUserLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  user: IUser;
+  setUser: React.Dispatch<React.SetStateAction<IUser>>;
+  email: string;
   id: string;
 }
 
 export const LoginWithAccessCode = ({
   isLoggedIn,
   setIsUserLoggedIn,
+  user,
+  setUser,
+  email,
   id
 }: LoginWithAccessCodeProps) => {
   const [loginCode, setLoginCode] = useState<string>("");
@@ -29,12 +36,10 @@ export const LoginWithAccessCode = ({
 
   const navigate = useNavigate();
 
-  const { email } = useParams();
-
   const sendLoginCode = async () => {
     try {
       const loginCodeResponse = await axios.post(
-        `http://localhost:5000/api/send-login-code/${id}`
+        `${process.env.REACT_APP_BACKEND_URL}/api/send-login-code/${email}`
       );
 
       if (loginCodeResponse.status === 200) {
@@ -62,20 +67,14 @@ export const LoginWithAccessCode = ({
     try {
       setIsLoading(true);
       const response = await axios.post(
-        `http://localhost:5000/api/login-with-code/${email}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/login-with-code/${email}`,
         { loginCode }
       );
 
       if (response.status === 200) {
         setIsUserLoggedIn(true);
         // Storing user ID in local storage
-        const { _id, role } = response.data;
-        const userObject = {
-          id: _id,
-          role: role,
-        };
-        localStorage.removeItem("user");
-        localStorage.setItem("user", JSON.stringify(userObject));
+        setUser(response.data);
         toast.success("Successfully authenticated. Logging in", {
           position: "bottom-center",
           theme: "colored",

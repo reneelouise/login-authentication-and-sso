@@ -4,7 +4,9 @@ import axios from 'axios';
 
 export const loginStatus = async () => {
     try {
-        const response = await axios.get("http://localhost:5000/api/login-status");
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/login-status`
+        );
         console.log("bloodseed we ah call yuh")
         return response.data  
     } catch (error) {

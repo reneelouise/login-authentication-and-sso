@@ -1,6 +1,5 @@
 import { SetStateAction, useEffect, useState } from "react";
 import { Container, Heading, Label, Button } from "./change-password.styles";
-import { ProfileMenu } from "../../components/profile-menu";
 import { PasswordInputComponent } from "../../components/password-input";
 import { PasswordStrength } from "../../components/password-strength";
 import axios from "axios";
@@ -30,7 +29,7 @@ export const ChangePassword = ({
 
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/change-password/${id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/change-password/${id}`,
         {
           oldPassword: currentPassword,
           password: newPassword,
@@ -67,7 +66,6 @@ export const ChangePassword = ({
 
   return (
     <Container>
-      <ProfileMenu isLoggedIn={isLoggedIn} id={id} />
       <Heading>Change Password</Heading>
       <form onSubmit={(e) => changePassword(e)}>
         <Label>Current Password:</Label>

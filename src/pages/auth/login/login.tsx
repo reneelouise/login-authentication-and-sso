@@ -16,14 +16,25 @@ import { PasswordInputComponent } from "../../../components/password-input";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import { IUser } from "../../../helpers";
 
 interface LoginProps {
   isLoggedIn: boolean;
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  email: string;
   setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  setUser: React.Dispatch<React.SetStateAction<IUser>>;
   id: string;
 }
-export const Login = ({ isLoggedIn, setIsLoggedIn, id }: LoginProps) => {
-  const [email, setEmail] = useState<string>("");
+
+export const Login = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  id,
+  setUser,
+  email,
+  setEmail,
+}: LoginProps) => {
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isLoginCodeSent, setIsLoginCodeSent] = useState<boolean>(false);
@@ -56,37 +67,19 @@ export const Login = ({ isLoggedIn, setIsLoggedIn, id }: LoginProps) => {
 
       setIsLoading(true);
       const response = await axios.post(
-        "http://localhost:5000/api/login",
+        `${process.env.REACT_APP_BACKEND_URL}/api/login`,
         userData
       );
 
       if (response.status === 200) {
-        setEmail("");
-        setPassword("");
         setIsLoading(false);
         setIsLoggedIn(true);
-
-        // Storing user ID in local storage
-        const { _id, role } = response.data;
-        const userObject = {
-          id: _id,
-          role: role,
-        };
-
-        if (_id && role) {
-          localStorage.removeItem("user");
-          localStorage.setItem("user", JSON.stringify(userObject));
-        } else {
-          toast.error("Error fetching user details, please refresh", {
-            position: "bottom-center",
-            theme: "colored",
-          });
-        }
+        setUser(response.data);
       }
     } catch (error: any) {
       console.error("Login Error: ", error);
-      const errorMessage = error.response.data.message
-        ? error.response.data.message
+      const errorMessage = error?.response?.data.message
+        ? error?.response?.data.message
         : "Login failed! Please try again.";
 
       if (error.response.status === 401) {
@@ -105,7 +98,7 @@ export const Login = ({ isLoggedIn, setIsLoggedIn, id }: LoginProps) => {
   const sendLoginCode = async () => {
     try {
       const loginCodeResponse = await axios.post(
-        `http://localhost:5000/api/send-login-code/${email}`
+        `${process.env.REACT_APP_BACKEND_URL}/api/send-login-code/${email}`
       );
 
       if (loginCodeResponse.status === 200) {
@@ -129,10 +122,10 @@ export const Login = ({ isLoggedIn, setIsLoggedIn, id }: LoginProps) => {
   };
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn && id) {
       navigate(`/profile/${id}`);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, id]);
 
   useEffect(() => {
     if (!isLoggedIn && isLoginCodeSent) {

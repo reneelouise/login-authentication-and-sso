@@ -32,7 +32,7 @@ export const ForgotPassword = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/forgot-password",
+        `${process.env.REACT_APP_BACKEND_URL}/api/forgot-password`,
         { email }
       );
 
@@ -48,8 +48,8 @@ export const ForgotPassword = () => {
       }
     } catch (error:any) {
       console.error("Error sending password reset email: ", error);
-      const errorMessage = error.response.data.message
-        ? error.response.data.message
+      const errorMessage = error?.response?.data.message
+        ? error?.response?.data.message
         : "Error sending password reset email. Please try again.";
       toast.error(errorMessage, {
         position: "bottom-center",

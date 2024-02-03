@@ -86,7 +86,7 @@ export const Register = () => {
       setIsLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/api/register",
+        `${process.env.REACT_APP_BACKEND_URL}/api/register`,
         userData
       );
 
@@ -110,7 +110,7 @@ export const Register = () => {
 
         // Call the endpoint to send the welcome email
         const welcomeEmailResponse = await axios.post(
-          "http://localhost:5000/api/send-automated-email",
+          `${process.env.REACT_APP_BACKEND_URL}/api/send-automated-email`,
           welcomeEmailData
         );
 

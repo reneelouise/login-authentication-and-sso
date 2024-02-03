@@ -16,25 +16,36 @@ import {
 import { Layout } from "./components/layout";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Navbar } from "./components/navbar";
-import { getCurrentUserId } from "./helpers";
+import { IUser } from "./helpers";
+import {ProfileMenu} from './components/profile-menu/profile-menu.component'
 
 axios.defaults.withCredentials = true; // enable axios to get user credentials
+
+const initialState: IUser = {
+  _id: "",
+  name: "",
+  email: "",
+  phone: "",
+  bio: "",
+  photo: "",
+  role: "",
+  isVerified: false,
+  token: "",
+};
 
 function App() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [id, setId] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [user, setUser] = useState<IUser>(initialState);
 
-  console.log("is logged in: ", isUserLoggedIn);
-  console.log("id is: ", id);
-
-  const isLoggedIn = async () => {
+  const isLoggedIn = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        "http://localhost:5000/api/login-status"
+        `${process.env.REACT_APP_BACKEND_URL}/api/login-status`
       );
       console.log("is user logged in baby?", response);
       setIsUserLoggedIn(response.data);
@@ -46,20 +57,13 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [])
+
+  const { _id, role, name } = user;
 
   useEffect(() => {
     isLoggedIn();
-  }, []);
-
-  useEffect(() => {
-    if (isUserLoggedIn) {
-      const userId = getCurrentUserId();
-      console.log("id: ", userId);
-      return setId(userId);
-    }
-    setId("")
-  }, [isUserLoggedIn]);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -73,11 +77,19 @@ function App() {
     };
   }, [isLoggedIn]);
 
+  console.log("user: ", user);
+
   return (
     <>
       <BrowserRouter>
-        <Navbar isLoggedIn={isUserLoggedIn} setIsLoggedIn={setIsUserLoggedIn} />
-        {isLoading && !id && !isLoggedIn ? (
+        <Navbar
+          isLoggedIn={isUserLoggedIn}
+          setIsLoggedIn={setIsUserLoggedIn}
+          name={name}
+          id={_id}
+        />
+        {isUserLoggedIn && !isLoading && <ProfileMenu isLoggedIn={isUserLoggedIn} id={_id} role={role} />}
+        {isLoading && !_id && !isLoggedIn ? (
           <h1>Loading baby!</h1>
         ) : (
           <Routes>
@@ -89,8 +101,11 @@ function App() {
                   children={
                     <Login
                       isLoggedIn={isUserLoggedIn}
+                      email={email}
+                      setEmail={setEmail}
                       setIsLoggedIn={setIsUserLoggedIn}
-                      id={id}
+                      setUser={setUser}
+                      id={_id}
                     />
                   }
                 />
@@ -113,14 +128,14 @@ function App() {
               element={<Layout children={<VerifyAccount />} />}
             />
             <Route
-              path={`/change-password/${id}`}
+              path={`/change-password/${_id}`}
               element={
                 <Layout
                   children={
                     <ChangePassword
                       isLoggedIn={isUserLoggedIn}
                       setIsLoggedIn={setIsUserLoggedIn}
-                      id={id}
+                      id={_id}
                     />
                   }
                 />
@@ -128,14 +143,17 @@ function App() {
             />
             {!isUserLoggedIn && (
               <Route
-                path={`/login-with-code/${id}`}
+                path={`/login-with-code/${email}`}
                 element={
                   <Layout
                     children={
                       <LoginWithAccessCode
                         isLoggedIn={isUserLoggedIn}
                         setIsUserLoggedIn={setIsUserLoggedIn}
-                        id={id}
+                        user={user}
+                        setUser={setUser}
+                        email={email}
+                        id={_id}
                       />
                     }
                   />
@@ -143,10 +161,12 @@ function App() {
               />
             )}
             <Route
-              path={`/profile/${id}`}
+              path={`/profile/${_id}`}
               element={
                 <Layout
-                  children={<Profile isLoggedIn={isUserLoggedIn} id={id} />}
+                  children={
+                    <Profile isLoggedIn={isUserLoggedIn} id={_id} user={user}/>
+                  }
                 />
               }
             />
@@ -155,10 +175,10 @@ function App() {
               element={<Layout children={<Dashboard />} />}
             />
             <Route
-              path={`/users/${id}`}
+              path={`/users/${_id}`}
               element={
                 <Layout
-                  children={<UserList isLoggedIn={isUserLoggedIn} id={id} />}
+                  children={<UserList isLoggedIn={isUserLoggedIn} id={_id} role={role} />}
                 />
               }
             />

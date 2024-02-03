@@ -13,26 +13,36 @@ import {
   TextArea,
   Button,
 } from "./profile.styles";
-import { ProfileMenu } from "../../components/profile-menu";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { Logout, validateEmail } from "../../helpers";
+import { IUser, Logout, validateEmail } from "../../helpers";
 
-const initialState = {
+
+interface IProfile {
+  name: string;
+  email: string;
+  phone: string;
+  bio: string;
+  photo: string;
+  role: string;
+
+}
+const initialState : IProfile = {
   name: "",
   email: "",
   phone: "",
   bio: "",
   photo: "",
-  role: undefined,
+  role: "",
 };
 
 interface IProfileProps {
   isLoggedIn: boolean;
   id: string;
+  user: IUser;
 }
 
-export const Profile = ({ isLoggedIn }: IProfileProps) => {
+export const Profile = ({ isLoggedIn, user}: IProfileProps) => {
   const [currentProfile, setCurrentProfile] =
     useState<ProfileProps>(initialState);
   const [profile, setProfile] = useState<ProfileProps>(initialState);
@@ -43,11 +53,7 @@ export const Profile = ({ isLoggedIn }: IProfileProps) => {
   const [biography, setBiography] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const userString = localStorage?.getItem("user");
-  const user = userString ? JSON.parse(userString) : null;
-  const id = user?.id;
-
-  const navigate = useNavigate();
+  const {_id } = user
 
   // get current user details
 
@@ -55,7 +61,10 @@ export const Profile = ({ isLoggedIn }: IProfileProps) => {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        `http://localhost:5000/api/register/${id}`
+        `${process.env.REACT_APP_BACKEND_URL}/api/register/${_id}`,
+        {
+          withCredentials: true,
+        }
       );
       console.log("response: ", response);
 
@@ -122,10 +131,13 @@ export const Profile = ({ isLoggedIn }: IProfileProps) => {
 
     try {
       const response = await axios.patch(
-        `http://localhost:5000/api/register/${id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/register/${_id}`,
         {
           ...profile,
           photo: profilePhoto !== null ? profilePhoto : undefined,
+        },
+        {
+          withCredentials: true,
         }
       );
 
@@ -166,17 +178,16 @@ export const Profile = ({ isLoggedIn }: IProfileProps) => {
   };
 
   useEffect(() => {
-    if (id) {
+    if (_id) {
       getUser();
       return;
     }
-  }, [id]);
+  }, [_id]);
 
   return isLoading ? (
     <div>Loading profile</div>
   ) : (
     <Container>
-      <ProfileMenu isLoggedIn={isLoggedIn} id={id} />
       <Heading>Profile</Heading>
       <ImageContainer>
         {profilePhoto?.length ? (

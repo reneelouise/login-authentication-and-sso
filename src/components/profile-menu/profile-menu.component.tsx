@@ -1,12 +1,15 @@
 import { Nav, NavLinks, NavLink, LinkToRoute } from "./profile-menu.styles";
+import {AdminAuthorLink} from '../protected/protected'
+
 
 
 interface ProfileMenuProps{
   isLoggedIn: boolean;
   id: string;
+  role: string;
 }
 
-export const ProfileMenu = ({isLoggedIn, id}: ProfileMenuProps ) => {
+export const ProfileMenu = ({isLoggedIn, id, role}: ProfileMenuProps ) => {
 
   return (
     <Nav>
@@ -15,13 +18,15 @@ export const ProfileMenu = ({isLoggedIn, id}: ProfileMenuProps ) => {
           <LinkToRoute to={`/profile/${id}`}>Profile</LinkToRoute>
         </NavLink>
         <NavLink>
-          <LinkToRoute to={`/change-password/${id}`}>Change Password</LinkToRoute>
+          <LinkToRoute to={`/change-password/${id}`}>
+            Change Password
+          </LinkToRoute>
         </NavLink>
-        {isLoggedIn && (
+        <AdminAuthorLink isLoggedIn={isLoggedIn} role={role}>
           <NavLink>
             (<LinkToRoute to={`/users/${id}`}>Users</LinkToRoute>)
           </NavLink>
-        )}
+        </AdminAuthorLink>
       </NavLinks>
     </Nav>
   );
