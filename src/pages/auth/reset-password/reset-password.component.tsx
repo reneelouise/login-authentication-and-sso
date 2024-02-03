@@ -18,12 +18,26 @@ export const ResetPassword = () => {
   const resetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if(!oldPassword.trim() || !password.trim() || !confirmPassword.trim()){
+      return toast.error("Please complete the password reset by filling out all fields", {
+        position: "bottom-center",
+        theme: "colored",
+      });
+    }
+
+    if(password !== confirmPassword){
+      return toast.error("Passwords do not match. Please check and try again", {
+        position: "bottom-center",
+        theme: "colored",
+      });
+    }
+
     try {
       const response = await axios.patch(
         "http://localhost:5000/api/change-password",
         {
-          oldPassword: oldPassword,
-          password: password,
+          oldPassword: oldPassword.trim(),
+          password: password.trim(),
         }
       );
 
@@ -57,7 +71,6 @@ export const ResetPassword = () => {
     }
   }, [isReset]);
 
-  console.log("password:", confirmPassword);
   return (
     <>
       <Container>
@@ -69,7 +82,7 @@ export const ResetPassword = () => {
           <PasswordInputComponent
             password={oldPassword}
             setPassword={setOldPassword}
-            placeholder="Old password"
+            placeholder="Current password"
           />
 
           <PasswordInputComponent

@@ -1,32 +1,25 @@
-import { useEffect, useState } from "react";
-import { loginStatus } from "../../permissions";
 import { Nav, NavLinks, NavLink, LinkToRoute } from "./profile-menu.styles";
 
-export const ProfileMenu = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const result = await loginStatus();
-      setIsLoggedIn(!!result); // Update state based on the result
-    };
+interface ProfileMenuProps{
+  isLoggedIn: boolean;
+  id: string;
+}
 
-    checkLoginStatus();
-    console.log("testinggg")
-  }, []);
+export const ProfileMenu = ({isLoggedIn, id}: ProfileMenuProps ) => {
 
   return (
     <Nav>
       <NavLinks>
         <NavLink>
-          <LinkToRoute to="/profile">Profile</LinkToRoute>
+          <LinkToRoute to={`/profile/${id}`}>Profile</LinkToRoute>
         </NavLink>
         <NavLink>
-          <LinkToRoute to="/change-password">Change Password</LinkToRoute>
+          <LinkToRoute to={`/change-password/${id}`}>Change Password</LinkToRoute>
         </NavLink>
         {isLoggedIn && (
           <NavLink>
-            (<LinkToRoute to="/users">Users</LinkToRoute>)
+            (<LinkToRoute to={`/users/${id}`}>Users</LinkToRoute>)
           </NavLink>
         )}
       </NavLinks>

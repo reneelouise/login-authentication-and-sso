@@ -14,3 +14,16 @@ export const validateEmail = (email: string) => {
 
   return validation.test(email);
 };
+
+
+
+
+export const getCurrentUserId = () => {
+    const User = localStorage.getItem("user");
+    if (User) {
+      const idValue = JSON.parse(User)?.id;
+      return idValue
+    } else {
+      console.log("Item not found in localStorage");
+    }
+  };

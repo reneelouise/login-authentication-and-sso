@@ -30,7 +30,6 @@ export const PasswordInputComponent = ({
       <PasswordInput
         type={showPassword ? "text" : "password"}
         placeholder={placeholder || "Password"}
-        required
         name="Password"
         value={password}
         onChange={(e: React.FormEvent<HTMLInputElement>) =>

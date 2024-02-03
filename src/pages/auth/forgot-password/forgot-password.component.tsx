@@ -11,6 +11,7 @@ import {
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import { validateEmail } from "../../../helpers";
 
 export const ForgotPassword = () => {
   const [email, setEmail] = useState<string>("");
@@ -21,13 +22,21 @@ export const ForgotPassword = () => {
   const getResetPasswordEmail = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!email.trim() || !validateEmail(email.trim())) {
+      return toast.error("Please enter a valid email address", {
+        position: "bottom-center",
+        draggable: true,
+        theme: "colored",
+      });
+    }
+
     try {
       const response = await axios.post(
         "http://localhost:5000/api/forgot-password",
         { email }
       );
 
-      console.log("response: ", response)
+      console.log("response: ", response);
 
       if (response.status === 200) {
         setIsResetEmailSent(true);
@@ -37,20 +46,21 @@ export const ForgotPassword = () => {
           theme: "colored",
         });
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error sending password reset email: ", error);
-      toast.error("Error sending password reset email. Please try again.", {
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "Error sending password reset email. Please try again.";
+      toast.error(errorMessage, {
         position: "bottom-center",
-        draggable: true,
         theme: "colored",
       });
     }
-    setEmail("");
   };
 
   useEffect(() => {
     if (isResetEmailSent) {
-      navigate("/");
+      navigate("/login");
     }
   }, [isResetEmailSent]);
   return (
@@ -66,10 +76,9 @@ export const ForgotPassword = () => {
 
           <InputContainer>
             <Input
-              type="email"
+              type="text"
               placeholder="Email address or username"
               name="email"
-              required
               value={email}
               onChange={(e: React.FormEvent<HTMLInputElement>) =>
                 setEmail(e.currentTarget.value)

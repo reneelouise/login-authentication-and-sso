@@ -3,6 +3,6 @@ export interface ProfileProps {
   email: string;
   phone: string;
   bio: string;
-  photo: string;
+  photo: string|null;
   role?: string;
 }

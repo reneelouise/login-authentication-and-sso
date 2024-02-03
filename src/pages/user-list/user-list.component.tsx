@@ -18,7 +18,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { User } from "./user-list.types";
 
-export const UserList = () => {
+interface UserListProps {
+  isLoggedIn: boolean;
+  id: string;
+}
+
+export const UserList = ({ isLoggedIn, id }: UserListProps) => {
   const [users, setUsers] = useState<User[]>([]);
 
   const BASE_URL = process.env.BACKEND_URL;
@@ -34,7 +39,7 @@ export const UserList = () => {
   };
 
   const verifiedUsers = users.filter((user) => user.isVerified);
-  const unverifiedUsers = users.filter((user) => !user.isVerified );
+  const unverifiedUsers = users.filter((user) => !user.isVerified);
 
   useEffect(() => {
     getAllUsers();
@@ -42,7 +47,7 @@ export const UserList = () => {
 
   return (
     <Container>
-      <ProfileMenu />
+      <ProfileMenu isLoggedIn={isLoggedIn} id={id} />
       <Heading>Stats</Heading>
       <StatsContainer>
         <Card

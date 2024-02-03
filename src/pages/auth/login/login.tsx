@@ -17,38 +17,18 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import axios from "axios";
 
-export const Login = () => {
+interface LoginProps {
+  isLoggedIn: boolean;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  id: string;
+}
+export const Login = ({ isLoggedIn, setIsLoggedIn, id }: LoginProps) => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isLoginCodeSent, setIsLoginCodeSent] = useState<boolean>(false);
 
   const navigate = useNavigate();
-
-  const sendLoginCode = async () => {
-    try {
-      const loginCodeResponse = await axios.post(
-        `http://localhost:5000/api/send-login-code/${email}`
-      );
-
-      if (loginCodeResponse.status === 200) {
-        setIsLoginCodeSent(true);
-        const { message } = loginCodeResponse.data;
-        toast.success(message, {
-          position: "bottom-center",
-          theme: "colored",
-          style: { width: "fit-content" },
-        });
-      }
-    } catch (error) {
-      console.error("error with sending login code: ", error);
-      toast.error("Error sending login code. Please try again.", {
-        position: "bottom-center",
-        theme: "colored",
-      });
-    }
-  };
 
   const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,6 +36,24 @@ export const Login = () => {
     const userData = { email, password };
 
     try {
+      if (!email.trim() || !password.trim()) {
+        toast.error("Please enter a valid email and password", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+
+        return;
+      }
+
+      if (password.trim().length < 6) {
+        toast.error("Password must be at least 6 characters", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+
+        return;
+      }
+
       setIsLoading(true);
       const response = await axios.post(
         "http://localhost:5000/api/login",
@@ -74,20 +72,27 @@ export const Login = () => {
           id: _id,
           role: role,
         };
-        localStorage.removeItem("user");
-        localStorage.setItem("user", JSON.stringify(userObject));
+
+        if (_id && role) {
+          localStorage.removeItem("user");
+          localStorage.setItem("user", JSON.stringify(userObject));
+        } else {
+          toast.error("Error fetching user details, please refresh", {
+            position: "bottom-center",
+            theme: "colored",
+          });
+        }
       }
     } catch (error: any) {
       console.error("Login Error: ", error);
-
-      if (error.response.status === 401) {
-        await sendLoginCode();
-        return;
-      }
-
       const errorMessage = error.response.data.message
         ? error.response.data.message
         : "Login failed! Please try again.";
+
+      if (error.response.status === 401) {
+        await sendLoginCode();
+      }
+
       toast.error(errorMessage, {
         position: "bottom-center",
         theme: "colored",
@@ -97,9 +102,35 @@ export const Login = () => {
     }
   };
 
+  const sendLoginCode = async () => {
+    try {
+      const loginCodeResponse = await axios.post(
+        `http://localhost:5000/api/send-login-code/${email}`
+      );
+
+      if (loginCodeResponse.status === 200) {
+        setIsLoginCodeSent(true);
+        const { message } = loginCodeResponse.data;
+        toast.success(message, {
+          position: "bottom-center",
+          theme: "colored",
+        });
+      }
+    } catch (error: any) {
+      console.error("error with sending login code: ", error);
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "Error sending login code. Please try again.";
+      toast.error(errorMessage, {
+        position: "bottom-center",
+        theme: "colored",
+      });
+    }
+  };
+
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/profile");
+      navigate(`/profile/${id}`);
     }
   }, [isLoggedIn]);
 
@@ -123,7 +154,6 @@ export const Login = () => {
               type="email"
               placeholder="Email address or username"
               name="email"
-              required
               value={email}
               onChange={(e: React.FormEvent<HTMLInputElement>) =>
                 setEmail(e.currentTarget.value)

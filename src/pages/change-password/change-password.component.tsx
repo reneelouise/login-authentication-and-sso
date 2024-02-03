@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { Container, Heading, Label, Button } from "./change-password.styles";
 import { ProfileMenu } from "../../components/profile-menu";
 import { PasswordInputComponent } from "../../components/password-input";
@@ -8,11 +8,20 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import { Logout } from "../../helpers";
 
-export const ChangePassword = () => {
+interface ChangePasswordProps {
+  isLoggedIn: boolean;
+  setIsLoggedIn: React.Dispatch<SetStateAction<boolean>>;
+  id: string;
+}
+
+export const ChangePassword = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  id,
+}: ChangePasswordProps) => {
   const [currentPassword, setCurrentPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
-  const [isReset, setIsReset] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
@@ -21,7 +30,7 @@ export const ChangePassword = () => {
 
     try {
       const response = await axios.patch(
-        "http://localhost:5000/api/change-password",
+        `http://localhost:5000/api/change-password/${id}`,
         {
           oldPassword: currentPassword,
           password: newPassword,
@@ -34,12 +43,7 @@ export const ChangePassword = () => {
           position: "bottom-center",
           theme: "colored",
         });
-
-        setCurrentPassword("");
-        setNewPassword("");
-        setConfirmNewPassword("");
-        setIsReset(true);
-        Logout();
+        setIsLoggedIn(false);
       }
     } catch (error: any) {
       console.error("Error resetting password: ", error);
@@ -55,14 +59,15 @@ export const ChangePassword = () => {
   };
 
   useEffect(() => {
-    if (isReset) {
+    if (!isLoggedIn) {
+      Logout();
       navigate("/login");
     }
-  }, [isReset]);
+  }, [isLoggedIn]);
 
   return (
     <Container>
-      <ProfileMenu />
+      <ProfileMenu isLoggedIn={isLoggedIn} id={id} />
       <Heading>Change Password</Heading>
       <form onSubmit={(e) => changePassword(e)}>
         <Label>Current Password:</Label>
