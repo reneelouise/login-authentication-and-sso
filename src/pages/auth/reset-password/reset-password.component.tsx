@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { MdPassword } from "react-icons/md";
-import { Container, Heading, Form, Button } from "../reset-password-protect/reset-password.styles";
+import {
+  Container,
+  Heading,
+  Form,
+  Button,
+} from "../reset-password-protect/reset-password.styles";
 import { PasswordInputComponent } from "../../../components/password-input";
 import { PasswordStrength } from "../../../components/password-strength";
 import { toast } from "react-toastify";
@@ -9,19 +14,21 @@ import { useNavigate } from "react-router";
 import { useParams } from "react-router-dom";
 
 export const ResetPassword = () => {
-  const [oldPassword, setOldPassword] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [isReset, setIsReset] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
+  console.log("password: ", password);
+  console.log("confirm password: ", confirmPassword);
+
   const { resetToken } = useParams();
 
   const resetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!oldPassword.trim() || !password.trim() || !confirmPassword.trim()) {
+    if (!password.trim() || !confirmPassword.trim()) {
       return toast.error(
         "Please complete the password reset by filling out all fields",
         {
@@ -39,10 +46,12 @@ export const ResetPassword = () => {
     }
 
     try {
+      console.log(
+        `path!: ${process.env.REACT_APP_BACKEND_URL}/api/reset-password/${resetToken}`
+      );
       const response = await axios.patch(
         `${process.env.REACT_APP_BACKEND_URL}/api/reset-password/${resetToken}`,
         {
-          oldPassword: oldPassword.trim(),
           password: password.trim(),
         }
       );
@@ -50,8 +59,7 @@ export const ResetPassword = () => {
       console.log("reset token: ", resetToken);
 
       if (response.status === 200) {
-        const { message } = response.data;
-        toast.success(message, {
+        toast.success("Password succesfully reset, please login", {
           position: "bottom-center",
           theme: "colored",
         });
@@ -62,8 +70,8 @@ export const ResetPassword = () => {
       }
     } catch (error: any) {
       console.error("Error resetting password: ", error);
-      const errorMessage = error.response.data.message
-        ? error.response.data.message
+      const errorMessage = error?.response?.data?.message
+        ? error?.response?.data?.message
         : "Error resetting password. Please try again.";
 
       toast.error(errorMessage, {
@@ -87,11 +95,6 @@ export const ResetPassword = () => {
         >
           <MdPassword size={35} />
           <Heading>Reset Password</Heading>
-          <PasswordInputComponent
-            password={oldPassword}
-            setPassword={setOldPassword}
-            placeholder="Current password"
-          />
 
           <PasswordInputComponent
             password={password}

@@ -19,7 +19,8 @@ import { toast, ToastContainer } from "react-toastify";
 import { useCallback, useEffect, useState } from "react";
 import { Navbar } from "./components/navbar";
 import { IUser } from "./helpers";
-import {ProfileMenu} from './components/profile-menu/profile-menu.component'
+import { ProfileMenu } from "./components/profile-menu/profile-menu.component";
+import { ResetPasswordProtect } from "./pages/auth/reset-password-protect/reset-password-protect.component";
 
 axios.defaults.withCredentials = true; // enable axios to get user credentials
 
@@ -50,14 +51,11 @@ function App() {
       console.log("is user logged in baby?", response);
       setIsUserLoggedIn(response.data);
     } catch (error) {
-      toast.error("Not authorised, please login", {
-        position: "bottom-center",
-        theme: "colored",
-      });
+      console.error(error)
     } finally {
       setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   const { _id, role, name } = user;
 
@@ -88,7 +86,9 @@ function App() {
           name={name}
           id={_id}
         />
-        {isUserLoggedIn && !isLoading && <ProfileMenu isLoggedIn={isUserLoggedIn} id={_id} role={role} />}
+        {isUserLoggedIn && !isLoading && (
+          <ProfileMenu isLoggedIn={isUserLoggedIn} id={_id} role={role} />
+        )}
         {isLoading && !_id && !isLoggedIn ? (
           <h1>Loading baby!</h1>
         ) : (
@@ -122,6 +122,10 @@ function App() {
             <Route
               path="/resetPassword/:resetToken"
               element={<Layout children={<ResetPassword />} />}
+            />
+            <Route
+              path="/reset-password-protect/:resetToken"
+              element={<Layout children={<ResetPasswordProtect />} />}
             />
             <Route
               path="/verify/:verificationToken"
@@ -165,7 +169,7 @@ function App() {
               element={
                 <Layout
                   children={
-                    <Profile isLoggedIn={isUserLoggedIn} id={_id} user={user}/>
+                    <Profile isLoggedIn={isUserLoggedIn} id={_id} user={user} />
                   }
                 />
               }
@@ -178,7 +182,13 @@ function App() {
               path={`/users/${_id}`}
               element={
                 <Layout
-                  children={<UserList isLoggedIn={isUserLoggedIn} id={_id} role={role} />}
+                  children={
+                    <UserList
+                      isLoggedIn={isUserLoggedIn}
+                      id={_id}
+                      role={role}
+                    />
+                  }
                 />
               }
             />
