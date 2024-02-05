@@ -17,7 +17,6 @@ import { IUser } from "../../../helpers";
 interface LoginWithAccessCodeProps {
   isLoggedIn: boolean;
   setIsUserLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
-  user: IUser;
   setUser: React.Dispatch<React.SetStateAction<IUser>>;
   email: string;
   id: string;
@@ -26,7 +25,6 @@ interface LoginWithAccessCodeProps {
 export const LoginWithAccessCode = ({
   isLoggedIn,
   setIsUserLoggedIn,
-  user,
   setUser,
   email,
   id
@@ -73,8 +71,8 @@ export const LoginWithAccessCode = ({
 
       if (response.status === 200) {
         setIsUserLoggedIn(true);
-        // Storing user ID in local storage
         setUser(response.data);
+        localStorage.setItem("id", response.data._id);
         toast.success("Successfully authenticated. Logging in", {
           position: "bottom-center",
           theme: "colored",

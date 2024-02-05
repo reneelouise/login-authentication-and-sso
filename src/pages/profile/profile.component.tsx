@@ -16,7 +16,7 @@ import {
 import axios from "axios";
 import { toast } from "react-toastify";
 import { IUser, Logout, validateEmail } from "../../helpers";
-
+import { useParams } from "react-router-dom";
 
 interface IProfile {
   name: string;
@@ -25,9 +25,8 @@ interface IProfile {
   bio: string;
   photo: string;
   role: string;
-
 }
-const initialState : IProfile = {
+const initialState: IProfile = {
   name: "",
   email: "",
   phone: "",
@@ -38,11 +37,9 @@ const initialState : IProfile = {
 
 interface IProfileProps {
   isLoggedIn: boolean;
-  id: string;
-  user: IUser;
-}
+  id: string;}
 
-export const Profile = ({ isLoggedIn, user}: IProfileProps) => {
+export const Profile = ({ isLoggedIn, id}: IProfileProps) => {
   const [currentProfile, setCurrentProfile] =
     useState<ProfileProps>(initialState);
   const [profile, setProfile] = useState<ProfileProps>(initialState);
@@ -53,7 +50,6 @@ export const Profile = ({ isLoggedIn, user}: IProfileProps) => {
   const [biography, setBiography] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const {_id } = user
 
   // get current user details
 
@@ -61,10 +57,7 @@ export const Profile = ({ isLoggedIn, user}: IProfileProps) => {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/register/${_id}`,
-        {
-          withCredentials: true,
-        }
+        `${process.env.REACT_APP_BACKEND_URL}/api/register/${id}`
       );
       console.log("response: ", response);
 
@@ -131,7 +124,7 @@ export const Profile = ({ isLoggedIn, user}: IProfileProps) => {
 
     try {
       const response = await axios.patch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/register/${_id}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/register/${id}`,
         {
           ...profile,
           photo: profilePhoto !== null ? profilePhoto : undefined,
@@ -178,11 +171,10 @@ export const Profile = ({ isLoggedIn, user}: IProfileProps) => {
   };
 
   useEffect(() => {
-    if (_id) {
+    if (isLoggedIn && id) {
       getUser();
-      return;
     }
-  }, [_id]);
+  }, []);
 
   return isLoading ? (
     <div>Loading profile</div>

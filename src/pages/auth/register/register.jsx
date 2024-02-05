@@ -30,7 +30,7 @@ export const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-
+  
   const registerUser = async (e) => {
     e.preventDefault();
 

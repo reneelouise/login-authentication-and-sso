@@ -40,6 +40,7 @@ function App() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [email, setEmail] = useState<string>("");
+  const [id, setId] = useState<string>("");
   const [user, setUser] = useState<IUser>(initialState);
 
   const isLoggedIn = useCallback(async () => {
@@ -48,20 +49,29 @@ function App() {
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/login-status`
       );
-      console.log("is user logged in baby?", response);
       setIsUserLoggedIn(response.data);
     } catch (error) {
-      console.error(error)
+      console.error(error);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const { _id, role, name } = user;
+  const storedId = localStorage.getItem("id");
+
 
   useEffect(() => {
     isLoggedIn();
   }, [isLoggedIn]);
+
+
+  useEffect(() => {
+    if(isUserLoggedIn && storedId){
+      setId(storedId)
+      console.log("set id to the: ", storedId)
+    }
+  }, [isUserLoggedIn, storedId]);
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -76,6 +86,9 @@ function App() {
   }, [isLoggedIn]);
 
   console.log("user: ", user);
+  console.log("id from storage: ", storedId);
+  console.log("id from user: ", _id);
+  console.log("id that has been set: ", id);
 
   return (
     <>
@@ -84,12 +97,12 @@ function App() {
           isLoggedIn={isUserLoggedIn}
           setIsLoggedIn={setIsUserLoggedIn}
           name={name}
-          id={_id}
+          id={id}
         />
         {isUserLoggedIn && !isLoading && (
-          <ProfileMenu isLoggedIn={isUserLoggedIn} id={_id} role={role} />
+          <ProfileMenu isLoggedIn={isUserLoggedIn} id={id} role={role} />
         )}
-        {isLoading && !_id && !isLoggedIn ? (
+        {isLoading && !id && !isLoggedIn ? (
           <h1>Loading baby!</h1>
         ) : (
           <Routes>
@@ -101,11 +114,11 @@ function App() {
                   children={
                     <Login
                       isLoggedIn={isUserLoggedIn}
+                      id={id}
                       email={email}
                       setEmail={setEmail}
                       setIsLoggedIn={setIsUserLoggedIn}
                       setUser={setUser}
-                      id={_id}
                     />
                   }
                 />
@@ -115,10 +128,12 @@ function App() {
               path="/register"
               element={<Layout children={<Register />} />}
             />
-            <Route
-              path="/forgot"
-              element={<Layout children={<ForgotPassword />} />}
-            />
+            {!isUserLoggedIn && (
+              <Route
+                path="/forgot"
+                element={<Layout children={<ForgotPassword />} />}
+              />
+            )}
             <Route
               path="/resetPassword/:resetToken"
               element={<Layout children={<ResetPassword />} />}
@@ -132,14 +147,14 @@ function App() {
               element={<Layout children={<VerifyAccount />} />}
             />
             <Route
-              path={`/change-password/${_id}`}
+              path={`/change-password/${id}`}
               element={
                 <Layout
                   children={
                     <ChangePassword
                       isLoggedIn={isUserLoggedIn}
                       setIsLoggedIn={setIsUserLoggedIn}
-                      id={_id}
+                      id={id}
                     />
                   }
                 />
@@ -154,10 +169,9 @@ function App() {
                       <LoginWithAccessCode
                         isLoggedIn={isUserLoggedIn}
                         setIsUserLoggedIn={setIsUserLoggedIn}
-                        user={user}
                         setUser={setUser}
                         email={email}
-                        id={_id}
+                        id={id}
                       />
                     }
                   />
@@ -165,11 +179,11 @@ function App() {
               />
             )}
             <Route
-              path={`/profile/${_id}`}
+              path={`/profile/${id}`}
               element={
                 <Layout
                   children={
-                    <Profile isLoggedIn={isUserLoggedIn} id={_id} user={user} />
+                    <Profile isLoggedIn={isUserLoggedIn} id={id} />
                   }
                 />
               }
@@ -179,13 +193,13 @@ function App() {
               element={<Layout children={<Dashboard />} />}
             />
             <Route
-              path={`/users/${_id}`}
+              path={`/users/${id}`}
               element={
                 <Layout
                   children={
                     <UserList
                       isLoggedIn={isUserLoggedIn}
-                      id={_id}
+                      id={id}
                       role={role}
                     />
                   }

@@ -46,9 +46,6 @@ export const ResetPassword = () => {
     }
 
     try {
-      console.log(
-        `path!: ${process.env.REACT_APP_BACKEND_URL}/api/reset-password/${resetToken}`
-      );
       const response = await axios.patch(
         `${process.env.REACT_APP_BACKEND_URL}/api/reset-password/${resetToken}`,
         {

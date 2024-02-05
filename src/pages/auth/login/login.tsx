@@ -37,6 +37,7 @@ export const Login = ({
 }: LoginProps) => {
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isLoginCodeSent, setIsLoginCodeSent] = useState<boolean>(false);
 
   const navigate = useNavigate();
@@ -73,8 +74,11 @@ export const Login = ({
 
       if (response.status === 200) {
         setIsLoading(false);
+        setIsSuccess(true);
         setIsLoggedIn(true);
         setUser(response.data);
+        localStorage.setItem("id", response.data._id);
+
       }
     } catch (error: any) {
       console.error("Login Error: ", error);
@@ -102,8 +106,7 @@ export const Login = ({
       );
 
       if (loginCodeResponse.status === 200) {
-        setIsLoginCodeSent(true);
-        const { message } = loginCodeResponse.data;
+        setIsLoginCodeSent(true);        const { message } = loginCodeResponse.data;
         toast.success(message, {
           position: "bottom-center",
           theme: "colored",
@@ -121,11 +124,12 @@ export const Login = ({
     }
   };
 
+
   useEffect(() => {
-    if (isLoggedIn && id) {
+    if (isLoggedIn && isSuccess && id) {
       navigate(`/profile/${id}`);
     }
-  }, [isLoggedIn, id]);
+  }, [isLoggedIn, id, isSuccess]);
 
   useEffect(() => {
     if (!isLoggedIn && isLoginCodeSent) {
