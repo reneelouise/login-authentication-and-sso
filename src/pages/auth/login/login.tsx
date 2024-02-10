@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { IUser } from "../../../helpers";
+import { GoogleLogin } from "@react-oauth/google";
 
 interface LoginProps {
   isLoggedIn: boolean;
@@ -79,7 +80,7 @@ export const Login = ({
         setUser(response.data);
         localStorage.setItem(
           "user",
-          JSON.stringify({ id: response.data._id, name: response.data.name})
+          JSON.stringify({ id: response.data._id, name: response.data.name })
         );
       }
     } catch (error: any) {
@@ -127,6 +128,35 @@ export const Login = ({
     }
   };
 
+  const googleLogin = async (credentialResponse: any) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/google/users/callback`,
+        { userToken: credentialResponse.credential }
+      );
+
+      if (response.status === 200) {
+        setIsLoading(false);
+        setIsSuccess(true);
+        setIsLoggedIn(true);
+        setUser(response.data);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: response.data._id, name: response.data.name })
+        );
+      }
+    } catch (error: any) {
+      console.error("error with Google login: ", error);
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "Error with Google login. Please try again.";
+      toast.error(errorMessage, {
+        position: "bottom-center",
+        theme: "colored",
+      });
+    }
+  };
+
   useEffect(() => {
     if (isLoggedIn && isSuccess && id) {
       navigate(`/profile/${id}`);
@@ -145,7 +175,12 @@ export const Login = ({
         <Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => loginUser(e)}>
           <BiLogIn size={35} />
           <Heading>Login</Heading>
-          <Button>Login with Google</Button>
+          <GoogleLogin
+            onSuccess={googleLogin}
+            onError={() => {
+              toast.error("Login failed", { position: "bottom-center" });
+            }}
+          />
           <Text>or</Text>
 
           <InputContainer>

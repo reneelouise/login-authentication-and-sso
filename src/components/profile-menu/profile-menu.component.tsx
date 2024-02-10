@@ -11,7 +11,6 @@ interface ProfileMenuProps{
 
 export const ProfileMenu = ({isLoggedIn, id, role}: ProfileMenuProps ) => {
 
-  console.log("role is: ", role)
   return (
     <Nav>
       <NavLinks>
@@ -28,7 +27,7 @@ export const ProfileMenu = ({isLoggedIn, id, role}: ProfileMenuProps ) => {
           role={role}
           children={
             <NavLink>
-              (<LinkToRoute to={`/users/${id}`}>Users</LinkToRoute>)
+              <LinkToRoute to={`/users/${id}`}>Users</LinkToRoute>
             </NavLink>
           }
         />

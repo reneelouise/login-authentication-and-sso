@@ -88,13 +88,13 @@ export const ChangePassword = ({
           setPassword={setNewPassword}
           placeholder="New password"
         />
-        {newPassword.length > 0 && <PasswordStrength password={newPassword} />}
         <Label>Confirm New Password:</Label>
         <PasswordInputComponent
           password={confirmNewPassword}
           setPassword={setConfirmNewPassword}
           placeholder="Confirm New Password"
         />
+        {newPassword.length > 0 && <PasswordStrength password={newPassword} />}
 
         <Button>Change Password</Button>
       </form>

@@ -1,3 +1,5 @@
 import logo  from "./logo.svg"
+import lock  from "./lock.svg"
 
-export {logo} 
+
+export { logo, lock }; 

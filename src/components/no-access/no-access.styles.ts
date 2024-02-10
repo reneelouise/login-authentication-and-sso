@@ -5,10 +5,12 @@ export const Container = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
+  align-items:center;
+  justify-content: center;
 `;
 
 
 export const Icon = styled.img`
-width: 200px;
+width: 400px;
 `
 export const Text = styled.h1``

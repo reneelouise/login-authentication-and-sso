@@ -20,9 +20,6 @@ export const ResetPassword = () => {
 
   const navigate = useNavigate();
 
-  console.log("password: ", password);
-  console.log("confirm password: ", confirmPassword);
-
   const { resetToken } = useParams();
 
   const resetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -52,8 +49,6 @@ export const ResetPassword = () => {
           password: password.trim(),
         }
       );
-
-      console.log("reset token: ", resetToken);
 
       if (response.status === 200) {
         toast.success("Password succesfully reset, please login", {

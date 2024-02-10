@@ -36,8 +36,6 @@ export const ForgotPassword = () => {
         { email }
       );
 
-      console.log("response: ", response);
-
       if (response.status === 200) {
         setIsResetEmailSent(true);
         toast.success(`Password reset email sent to ${email}`, {

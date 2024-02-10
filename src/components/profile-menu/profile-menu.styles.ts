@@ -9,22 +9,31 @@ const Nav = styled.nav`
 
 const NavLinks = styled.ul`
   display: flex;
-  background-color: black;
   border-radius: 4px;
+  padding: unset;
 `;
 
 const NavLink = styled.li`
   list-style: none;
-  background-color: black;
   cursor: pointer;
   margin: 8px;
+
+  &:focus-within {
+    text-decoration: underline;
+  }
 `;
 
 const LinkToRoute = styled(Link)`
   text-decoration: none;
   font-size: 16px;
   font-weight: 600;
-  color: white;
+  color: black;
+
+  &:hover {
+    color: grey;
+  }
+
+
 `;
 
 export { Nav, NavLinks, NavLink, LinkToRoute };

@@ -147,7 +147,6 @@ export const Register = () => {
       setIsLoading(false);
     }
 
-    console.log("user data: ", userData);
   };
 
   useEffect(() => {

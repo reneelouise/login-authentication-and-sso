@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { NoAccess } from "../no-access/no-access";
 
 interface ShowLinksProps {
   isLoggedIn: boolean;
@@ -32,7 +33,7 @@ export const AdminAuthorLink = ({
   // TODO: find a way to not use stringify
   if (
     isLoggedIn &&
-    (role === JSON.stringify("admin") || role === "author")
+    (role === JSON.stringify("admin"))
   ) {
     return <>{children}</>;
   }

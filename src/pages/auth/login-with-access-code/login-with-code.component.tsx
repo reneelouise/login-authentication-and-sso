@@ -95,6 +95,44 @@ export const LoginWithAccessCode = ({
       setIsLoading(false);
     }
   };
+  
+  
+  const loginWithGoogle = async (userToken: string, e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      setIsLoading(true);
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/google/users/callback`,
+        { loginCode }
+      );
+
+      if (response.status === 200) {
+        setIsUserLoggedIn(true);
+        setUser(response.data);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: response.data._id, name: response.data.name})
+        );
+        toast.success("Successfully authenticated. Logging in", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+      }
+    } catch (error: any) {
+      console.error("There was a problem logging in: ", error);
+
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "There was a problem logging in";
+      toast.error(errorMessage, {
+        position: "bottom-center",
+        theme: "colored",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (isLoggedIn) {

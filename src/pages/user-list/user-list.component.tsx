@@ -4,21 +4,18 @@ import {
   StatsContainer,
   Input,
   TextAndSearchContainer,
-  TableContainer,
-  TableBody,
-  TableHeading,
-  TableRow,
-  TableData,
 } from "./user-list.styles";
 import { Card } from "../../components/stats-card";
 import { FaUsers } from "react-icons/fa6";
 import { BiUserCheck, BiUserMinus, BiSolidUserX } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { User } from "./user-list.types";
+import { User, UserData } from "./user-list.types";
 import { toast } from "react-toastify";
 import { AdminAuthorLink } from "../../components/protected/protected";
 import { format } from "date-fns";
+import { UserGrid } from "../../components/user-grid/user-grid";
+import { NoAccess } from "../../components/no-access/no-access";
 
 interface UserListProps {
   isLoggedIn: boolean;
@@ -27,14 +24,64 @@ interface UserListProps {
 
 export const UserList = ({ isLoggedIn, role }: UserListProps) => {
   const [users, setUsers] = useState<User[]>([]);
+  const [rowData, setRowData] = useState<UserData[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+
+  const columnDefs = [
+    { field: "id" },
+    { field: "name" },
+    { field: "email" },
+    { field: "phone" },
+    { field: "role" },
+    { field: "verified" },
+    { field: "date" },
+  ];
 
   const getAllUsers = async () => {
     try {
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/register`
       );
-      setUsers(response.data);
-      console.log("response: ", response);
+      const result = response.data;
+      setUsers(result);
+      // Properties you want to exclude
+      const excludedProperties = [
+        "password",
+        "photo",
+        "__v",
+        "updatedAt",
+        "userAgent",
+        "bio",
+      ];
+
+      // Mapping between old and new keys to display in ag grid
+      const keyMappings: { [key: string]: string } = {
+        _id: "id",
+        isVerified: "verified",
+        createdAt: "date",
+      };
+
+      const transformedResult = result.map((obj: any) => {
+        const newObj: { [key: string]: any } = {};
+        for (const key in obj) {
+          if (!excludedProperties.includes(key)) {
+            if (key === "createdAt" && obj[key]) {
+              // Format date using date-fns
+              newObj[keyMappings[key]] = format(
+                new Date(obj[key]),
+                "MMMM do yyyy, h:mm a"
+              );
+            } else {
+              newObj[keyMappings[key] || key] = obj[key];
+            }
+          }
+        }
+        return newObj;
+      });
+
+      setRowData(transformedResult);
+      setAllUsers(transformedResult);
     } catch (error) {
       console.error(error);
     }
@@ -43,6 +90,22 @@ export const UserList = ({ isLoggedIn, role }: UserListProps) => {
   const verifiedUsers = users.filter((user) => user.isVerified);
   const unverifiedUsers = users.filter((user) => !user.isVerified);
   const suspendedUsers = users.filter((user) => user.role === "suspended");
+
+  const filterUsers = (query: string) => {
+    if (query.trim() === "") {
+      setRowData(allUsers); // Show the full list when search query is empty
+      return;
+    }
+
+    const filteredRows = rowData.filter((user: UserData) => {
+      const lowerCaseQuery = query.toLowerCase();
+      return (
+        user.name.toLowerCase().includes(lowerCaseQuery) ||
+        user.email.toLowerCase().includes(lowerCaseQuery)
+      );
+    });
+    setRowData(filteredRows);
+  };
 
   useEffect(() => {
     if (isLoggedIn && role) {
@@ -55,10 +118,14 @@ export const UserList = ({ isLoggedIn, role }: UserListProps) => {
     }
   }, [isLoggedIn, role]);
 
+  useEffect(() => {
+    filterUsers(searchQuery);
+  }, [searchQuery]);
+
   const renderUserList = () => {
     return (
       <Container>
-        <Heading>Stats</Heading>
+        <Heading>Overview</Heading>
         <StatsContainer>
           <Card
             icon={<FaUsers size={90} />}
@@ -85,48 +152,29 @@ export const UserList = ({ isLoggedIn, role }: UserListProps) => {
             bgColor="hotpink"
           />
         </StatsContainer>
-
         <TextAndSearchContainer>
           <Heading>All Users</Heading>
           <div>
-            <Input type="text" placeholder="Search Users" />
+            <Input
+              type="text"
+              placeholder="Search by name or email"
+              value={searchQuery}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setSearchQuery(event.target.value);
+              }}
+            />
           </div>
         </TextAndSearchContainer>
-        <TableContainer>
-          <TableHeading>
-            <TableRow>
-              <TableData>User ID</TableData>
-              <TableData>Name</TableData>
-              <TableData>Email</TableData>
-              <TableData>Role</TableData>
-              <TableData>Verified</TableData>
-              <TableData>Date Joined</TableData>
-            </TableRow>
-          </TableHeading>
-          <TableBody>
-            {users?.map((user, idx) => {
-              return (
-                <TableRow>
-                  <TableData>{user._id}</TableData>
-                  <TableData>{user.name}</TableData>
-                  <TableData>{user.email}</TableData>
-                  <TableData>{user.role}</TableData>
-                  <TableData>{user.isVerified ? "Yes" : "No"}</TableData>
-                  <TableData>
-                    {format(user.createdAt, "MMMM do yyyy, h:mm a")}
-                  </TableData>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </TableContainer>
+        <UserGrid rowData={rowData} colDefs={columnDefs} />
       </Container>
     );
   };
 
-  console.log("the role that has been passed is :", role);
+  const hasAccess = role === JSON.stringify("admin") && isLoggedIn;
 
-  return (
+  return !hasAccess ? (
+    <NoAccess />
+  ) : (
     <AdminAuthorLink
       role={role}
       isLoggedIn={isLoggedIn}

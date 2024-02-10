@@ -43,7 +43,7 @@ export const PasswordInputComponent = ({
             togglePasswordVisibility(e)
           }
         >
-          <AiOutlineEye />
+          <AiOutlineEyeInvisible />
         </PasswordButtonIcon>
       ) : (
         <PasswordButtonIcon
@@ -51,7 +51,8 @@ export const PasswordInputComponent = ({
             togglePasswordVisibility(e)
           }
         >
-          <AiOutlineEyeInvisible />
+          
+          <AiOutlineEye />
         </PasswordButtonIcon>
       )}
     </PasswordInputContainer>

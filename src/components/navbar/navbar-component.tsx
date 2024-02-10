@@ -7,6 +7,9 @@ import {
   NavLinks,
   NavLink,
   LinkToRoute,
+  Button,
+  NameContainer,
+  ButtonLink,
 } from "./navbar.styles";
 import { logo } from "../../assets";
 import { BsPersonCircle } from "react-icons/bs";
@@ -23,7 +26,12 @@ interface NavBarProps {
   name: string;
   id: string;
 }
-export const Navbar = ({ isLoggedIn, setIsLoggedIn, name, id }: NavBarProps) => {
+export const Navbar = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  name,
+  id,
+}: NavBarProps) => {
   const navigate = useNavigate();
   const handleLogout = () => {
     Logout();
@@ -33,23 +41,32 @@ export const Navbar = ({ isLoggedIn, setIsLoggedIn, name, id }: NavBarProps) => 
 
   return (
     <Nav>
-      <Logo src={logo} alt="rolk logo" />
+      <LinkToRoute to="/">
+        <Logo src={logo} alt="rolk logo" />
+      </LinkToRoute>
+      <ShowOnLogin isLoggedIn={isLoggedIn}>
+        <NameContainer>
+          <BsPersonCircle />
+          <Text>Hello, {name}</Text>
+        </NameContainer>
+      </ShowOnLogin>
       <NavLinks>
         <ShowOnLogin isLoggedIn={isLoggedIn}>
           <Container>
-            <BsPersonCircle />
-            <Text>Hi, {name}</Text>
             <NavLink>
+              <LinkToRoute to={`/`}>Home</LinkToRoute>
+            </NavLink>
+             <NavLink>
               <LinkToRoute to={`/profile/${id}`}>Profile</LinkToRoute>
             </NavLink>
-            <button style={{ color: "white" }} onClick={handleLogout}>
+            <Button onClick={handleLogout}>
               Logout
-            </button>
+            </Button>
           </Container>
         </ShowOnLogin>
         <ShowOnLogout isLoggedIn={isLoggedIn}>
           <NavLink>
-            <LinkToRoute to="/login"> Login</LinkToRoute>
+            <ButtonLink to="/login"> Login</ButtonLink>
           </NavLink>
         </ShowOnLogout>
       </NavLinks>

@@ -59,8 +59,6 @@ export const Profile = ({ isLoggedIn, id, setName }: IProfileProps) => {
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/register/${id}`
       );
-      console.log("response bby: ", response);
-
       const { name, email, phone, bio, photo, role } = response.data;
 
       setCurrentProfile({
@@ -145,7 +143,6 @@ export const Profile = ({ isLoggedIn, id, setName }: IProfileProps) => {
           theme: "colored",
         });
 
-        console.log("username is: ", username);
         localStorage.removeItem("user");
         localStorage.setItem(
           "user",

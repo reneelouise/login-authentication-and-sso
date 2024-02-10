@@ -13,3 +13,13 @@ export interface User {
   updatedAt: string;
   __v: number;
 }
+
+export interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  role: string;
+  isVerified: boolean;
+  createdAt: string;
+}

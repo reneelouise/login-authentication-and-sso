@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import "./App.css";
 import {
   Dashboard,
@@ -15,12 +15,13 @@ import {
 } from "./pages";
 import { Layout } from "./components/layout";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import { useCallback, useEffect, useState } from "react";
 import { Navbar } from "./components/navbar";
 import { IUser } from "./helpers";
 import { ProfileMenu } from "./components/profile-menu/profile-menu.component";
 import { ResetPasswordProtect } from "./pages/auth/reset-password-protect/reset-password-protect.component";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 axios.defaults.withCredentials = true; // enable axios to get user credentials
 
@@ -43,7 +44,7 @@ function App() {
   const [name, setName] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [user, setUser] = useState<IUser>(initialState);
-  const [role, setRole]= useState<string>("")
+  const [role, setRole] = useState<string>("");
 
   const isLoggedIn = useCallback(async () => {
     try {
@@ -60,31 +61,29 @@ function App() {
   }, []);
 
   const storedUser = localStorage.getItem("user");
-  const storedRole = localStorage.getItem("role")
-  console.log("storedRole:", storedRole)
+  const storedRole = localStorage.getItem("role");
 
-  
+  const location = useLocation();
+  const isHomepage = location.pathname === "/" || location.pathname ==="/home" 
+  const showProfileMenu =
+    isUserLoggedIn && !isLoading && !isHomepage
+
 
   useEffect(() => {
     isLoggedIn();
   }, [isLoggedIn]);
 
-
   useEffect(() => {
     if (isUserLoggedIn && storedUser) {
-      const userObject = JSON.parse(storedUser)
+      const userObject = JSON.parse(storedUser);
       setId(userObject.id);
       setName(userObject.name);
-      console.log("set id to the: ", userObject.id);
-
     }
   }, [isUserLoggedIn, storedUser]);
-  
+
   useEffect(() => {
     if (isUserLoggedIn && storedRole) {
       setRole(storedRole);
-      console.log("set role to the: ", storedRole);
-
     }
   }, [isUserLoggedIn, storedRole]);
 
@@ -100,22 +99,24 @@ function App() {
     };
   }, [isLoggedIn]);
 
+  const googleClientId = process.env.REACT_APP_GOOGLE_CLIENT_ID || "";
+
 
   return (
     <>
-      <BrowserRouter>
-        <Navbar
-          isLoggedIn={isUserLoggedIn}
-          setIsLoggedIn={setIsUserLoggedIn}
-          name={name}
-          id={id}
-        />
-        {isUserLoggedIn && !isLoading && (
-          <ProfileMenu isLoggedIn={isUserLoggedIn} id={id} role={role} />
-        )}
-        {isLoading && !id && !isLoggedIn ? (
-          <h1>Loading baby!</h1>
-        ) : (
+      <Navbar
+        isLoggedIn={isUserLoggedIn}
+        setIsLoggedIn={setIsUserLoggedIn}
+        name={name}
+        id={id}
+      />
+      {showProfileMenu && (
+        <ProfileMenu isLoggedIn={isUserLoggedIn} id={id} role={role} />
+      )}
+      {isLoading && !id && !isLoggedIn ? (
+        <h1>Loading baby!</h1>
+      ) : (
+        <GoogleOAuthProvider clientId={googleClientId}>
           <Routes>
             <Route path="/" element={<Layout children={<Home />} />} />
             <Route
@@ -193,7 +194,13 @@ function App() {
               path={`/profile/${id}`}
               element={
                 <Layout
-                  children={<Profile isLoggedIn={isUserLoggedIn} id={id} setName={setName}/>}
+                  children={
+                    <Profile
+                      isLoggedIn={isUserLoggedIn}
+                      id={id}
+                      setName={setName}
+                    />
+                  }
                 />
               }
             />
@@ -212,8 +219,8 @@ function App() {
               }
             />
           </Routes>
-        )}
-      </BrowserRouter>
+        </GoogleOAuthProvider>
+      )}
       <ToastContainer />
     </>
   );
