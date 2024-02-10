@@ -36,6 +36,13 @@ export const ChangePassword = ({
         }
       );
 
+      if (newPassword !== confirmNewPassword) {
+        return toast.error("Passwords do not match", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+      }
+
       if (response.status === 200) {
         const { message } = response.data;
         toast.success(message, {

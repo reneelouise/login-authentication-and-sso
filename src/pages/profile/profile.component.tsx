@@ -15,8 +15,7 @@ import {
 } from "./profile.styles";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { IUser, Logout, validateEmail } from "../../helpers";
-import { useParams } from "react-router-dom";
+import { validateEmail } from "../../helpers";
 
 interface IProfile {
   name: string;
@@ -37,9 +36,11 @@ const initialState: IProfile = {
 
 interface IProfileProps {
   isLoggedIn: boolean;
-  id: string;}
+  id: string;
+  setName: React.Dispatch<React.SetStateAction<string>>;
+}
 
-export const Profile = ({ isLoggedIn, id}: IProfileProps) => {
+export const Profile = ({ isLoggedIn, id, setName }: IProfileProps) => {
   const [currentProfile, setCurrentProfile] =
     useState<ProfileProps>(initialState);
   const [profile, setProfile] = useState<ProfileProps>(initialState);
@@ -50,7 +51,6 @@ export const Profile = ({ isLoggedIn, id}: IProfileProps) => {
   const [biography, setBiography] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-
   // get current user details
 
   const getUser = async () => {
@@ -59,7 +59,7 @@ export const Profile = ({ isLoggedIn, id}: IProfileProps) => {
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/register/${id}`
       );
-      console.log("response: ", response);
+      console.log("response bby: ", response);
 
       const { name, email, phone, bio, photo, role } = response.data;
 
@@ -71,6 +71,11 @@ export const Profile = ({ isLoggedIn, id}: IProfileProps) => {
         photo: photo,
         role: role,
       });
+
+      const roleInLocalStorage = localStorage.getItem("role");
+      if (!roleInLocalStorage) {
+        localStorage.setItem("role", role);
+      }
 
       setUsername(name);
       setEmailAddress(email);
@@ -116,7 +121,7 @@ export const Profile = ({ isLoggedIn, id}: IProfileProps) => {
     e.preventDefault();
 
     if (!hasMadeValidProfileChange()) {
-      return toast.error("Make a change to update profile", {
+      return toast.error("Make a change to update your profile", {
         position: "bottom-center",
         theme: "colored",
       });
@@ -140,6 +145,13 @@ export const Profile = ({ isLoggedIn, id}: IProfileProps) => {
           theme: "colored",
         });
 
+        console.log("username is: ", username);
+        localStorage.removeItem("user");
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: id, name: username })
+        );
+        setName(username);
         return;
       }
     } catch (error: any) {

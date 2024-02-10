@@ -15,7 +15,8 @@ export interface IUser {
 export const Logout = async () => {
   try {
     await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/logout`);
-    localStorage.removeItem("id")
+    localStorage.removeItem("user")
+    localStorage.removeItem("role")
   } catch (error: any) {
     console.error("Error logging out user: ", error);
   }

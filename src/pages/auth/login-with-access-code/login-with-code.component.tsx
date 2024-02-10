@@ -27,7 +27,7 @@ export const LoginWithAccessCode = ({
   setIsUserLoggedIn,
   setUser,
   email,
-  id
+  id,
 }: LoginWithAccessCodeProps) => {
   const [loginCode, setLoginCode] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -72,7 +72,10 @@ export const LoginWithAccessCode = ({
       if (response.status === 200) {
         setIsUserLoggedIn(true);
         setUser(response.data);
-        localStorage.setItem("id", response.data._id);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: response.data._id, name: response.data.name})
+        );
         toast.success("Successfully authenticated. Logging in", {
           position: "bottom-center",
           theme: "colored",

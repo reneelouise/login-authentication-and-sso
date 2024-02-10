@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   Nav,
   Logo,
@@ -30,6 +30,7 @@ export const Navbar = ({ isLoggedIn, setIsLoggedIn, name, id }: NavBarProps) => 
     setIsLoggedIn(false);
     navigate("/login");
   };
+
   return (
     <Nav>
       <Logo src={logo} alt="rolk logo" />
@@ -41,9 +42,9 @@ export const Navbar = ({ isLoggedIn, setIsLoggedIn, name, id }: NavBarProps) => 
             <NavLink>
               <LinkToRoute to={`/profile/${id}`}>Profile</LinkToRoute>
             </NavLink>
-              <button style={{ color: "white" }} onClick={handleLogout}>
-                Logout
-              </button>
+            <button style={{ color: "white" }} onClick={handleLogout}>
+              Logout
+            </button>
           </Container>
         </ShowOnLogin>
         <ShowOnLogout isLoggedIn={isLoggedIn}>

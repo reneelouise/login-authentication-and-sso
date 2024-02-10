@@ -29,9 +29,12 @@ export const AdminAuthorLink = ({
   isLoggedIn,
   role,
 }: ShowAdminLinkProps) => {
-  if (isLoggedIn && (role === "admin" || "author")) {
+  // TODO: find a way to not use stringify
+  if (
+    isLoggedIn &&
+    (role === JSON.stringify("admin") || role === "author")
+  ) {
     return <>{children}</>;
   }
-
   return null;
 };

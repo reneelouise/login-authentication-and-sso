@@ -40,8 +40,10 @@ function App() {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
   const [id, setId] = useState<string>("");
   const [user, setUser] = useState<IUser>(initialState);
+  const [role, setRole]= useState<string>("")
 
   const isLoggedIn = useCallback(async () => {
     try {
@@ -57,9 +59,11 @@ function App() {
     }
   }, []);
 
-  const { _id, role, name } = user;
-  const storedId = localStorage.getItem("id");
+  const storedUser = localStorage.getItem("user");
+  const storedRole = localStorage.getItem("role")
+  console.log("storedRole:", storedRole)
 
+  
 
   useEffect(() => {
     isLoggedIn();
@@ -67,11 +71,22 @@ function App() {
 
 
   useEffect(() => {
-    if(isUserLoggedIn && storedId){
-      setId(storedId)
-      console.log("set id to the: ", storedId)
+    if (isUserLoggedIn && storedUser) {
+      const userObject = JSON.parse(storedUser)
+      setId(userObject.id);
+      setName(userObject.name);
+      console.log("set id to the: ", userObject.id);
+
     }
-  }, [isUserLoggedIn, storedId]);
+  }, [isUserLoggedIn, storedUser]);
+  
+  useEffect(() => {
+    if (isUserLoggedIn && storedRole) {
+      setRole(storedRole);
+      console.log("set role to the: ", storedRole);
+
+    }
+  }, [isUserLoggedIn, storedRole]);
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -85,10 +100,6 @@ function App() {
     };
   }, [isLoggedIn]);
 
-  console.log("user: ", user);
-  console.log("id from storage: ", storedId);
-  console.log("id from user: ", _id);
-  console.log("id that has been set: ", id);
 
   return (
     <>
@@ -182,9 +193,7 @@ function App() {
               path={`/profile/${id}`}
               element={
                 <Layout
-                  children={
-                    <Profile isLoggedIn={isUserLoggedIn} id={id} />
-                  }
+                  children={<Profile isLoggedIn={isUserLoggedIn} id={id} setName={setName}/>}
                 />
               }
             />
@@ -197,11 +206,7 @@ function App() {
               element={
                 <Layout
                   children={
-                    <UserList
-                      isLoggedIn={isUserLoggedIn}
-                      id={id}
-                      role={role}
-                    />
+                    <UserList isLoggedIn={isUserLoggedIn} role={role} />
                   }
                 />
               }

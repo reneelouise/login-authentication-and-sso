@@ -44,3 +44,23 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+
+## left to fix
+
+- name is being removed from navbar on refresh of profile page (fixed)
+- permission denied when navigating to users page as an author (fixed)
+- delete password protect route, controller and component (fixed)
+- clean up user list component design wise 
+- read directly from users how many are suspended (fixed)
+- is a check being performed on login for suspended users and blocking them from logging in?
+- write tests to cover the main flow of the app
+- make them run on every push
+- configure ci/cd
+- fix error in server terminal
+- what happens when a user tried to visit the login page again when logged in (they should be logged out! play stupid games, win stupid prizes)
+- should hide user list summary also when permission denied
+- very annoying 2x toast popping up for user denied
+- fix errors in terminal
+- fix styling 

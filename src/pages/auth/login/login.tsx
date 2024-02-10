@@ -77,8 +77,10 @@ export const Login = ({
         setIsSuccess(true);
         setIsLoggedIn(true);
         setUser(response.data);
-        localStorage.setItem("id", response.data._id);
-
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: response.data._id, name: response.data.name})
+        );
       }
     } catch (error: any) {
       console.error("Login Error: ", error);
@@ -106,7 +108,8 @@ export const Login = ({
       );
 
       if (loginCodeResponse.status === 200) {
-        setIsLoginCodeSent(true);        const { message } = loginCodeResponse.data;
+        setIsLoginCodeSent(true);
+        const { message } = loginCodeResponse.data;
         toast.success(message, {
           position: "bottom-center",
           theme: "colored",
@@ -123,7 +126,6 @@ export const Login = ({
       });
     }
   };
-
 
   useEffect(() => {
     if (isLoggedIn && isSuccess && id) {
