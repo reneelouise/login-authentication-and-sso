@@ -30,7 +30,6 @@ export const PasswordInputComponent = ({
       <PasswordInput
         type={showPassword ? "text" : "password"}
         placeholder={placeholder || "Password"}
-        required
         name="Password"
         value={password}
         onChange={(e: React.FormEvent<HTMLInputElement>) =>
@@ -44,7 +43,7 @@ export const PasswordInputComponent = ({
             togglePasswordVisibility(e)
           }
         >
-          <AiOutlineEye />
+          <AiOutlineEyeInvisible />
         </PasswordButtonIcon>
       ) : (
         <PasswordButtonIcon
@@ -52,7 +51,8 @@ export const PasswordInputComponent = ({
             togglePasswordVisibility(e)
           }
         >
-          <AiOutlineEyeInvisible />
+          
+          <AiOutlineEye />
         </PasswordButtonIcon>
       )}
     </PasswordInputContainer>

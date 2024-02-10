@@ -16,39 +16,32 @@ import { PasswordInputComponent } from "../../../components/password-input";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 import axios from "axios";
+import { IUser } from "../../../helpers";
+import { GoogleLogin } from "@react-oauth/google";
 
-export const Login = () => {
-  const [email, setEmail] = useState<string>("");
+interface LoginProps {
+  isLoggedIn: boolean;
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  email: string;
+  setIsLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  setUser: React.Dispatch<React.SetStateAction<IUser>>;
+  id: string;
+}
+
+export const Login = ({
+  isLoggedIn,
+  setIsLoggedIn,
+  id,
+  setUser,
+  email,
+  setEmail,
+}: LoginProps) => {
   const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [isLoginCodeSent, setIsLoginCodeSent] = useState<boolean>(false);
 
   const navigate = useNavigate();
-
-  const sendLoginCode = async () => {
-    try {
-      const loginCodeResponse = await axios.post(
-        `http://localhost:5000/api/send-login-code/${email}`
-      );
-
-      if (loginCodeResponse.status === 200) {
-        setIsLoginCodeSent(true);
-        const { message } = loginCodeResponse.data;
-        toast.success(message, {
-          position: "bottom-center",
-          theme: "colored",
-          style: { width: "fit-content" },
-        });
-      }
-    } catch (error) {
-      console.error("error with sending login code: ", error);
-      toast.error("Error sending login code. Please try again.", {
-        position: "bottom-center",
-        theme: "colored",
-      });
-    }
-  };
 
   const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -56,29 +49,50 @@ export const Login = () => {
     const userData = { email, password };
 
     try {
+      if (!email.trim() || !password.trim()) {
+        toast.error("Please enter a valid email and password", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+
+        return;
+      }
+
+      if (password.trim().length < 6) {
+        toast.error("Password must be at least 6 characters", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+
+        return;
+      }
+
       setIsLoading(true);
       const response = await axios.post(
-        "http://localhost:5000/api/login",
+        `${process.env.REACT_APP_BACKEND_URL}/api/login`,
         userData
       );
 
       if (response.status === 200) {
-        setEmail("");
-        setPassword("");
         setIsLoading(false);
+        setIsSuccess(true);
         setIsLoggedIn(true);
+        setUser(response.data);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: response.data._id, name: response.data.name })
+        );
       }
     } catch (error: any) {
       console.error("Login Error: ", error);
+      const errorMessage = error?.response?.data.message
+        ? error?.response?.data.message
+        : "Login failed! Please try again.";
 
       if (error.response.status === 401) {
         await sendLoginCode();
-        return;
       }
 
-      const errorMessage = error.response.data.message
-        ? error.response.data.message
-        : "Login failed! Please try again.";
       toast.error(errorMessage, {
         position: "bottom-center",
         theme: "colored",
@@ -88,11 +102,66 @@ export const Login = () => {
     }
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/profile");
+  const sendLoginCode = async () => {
+    try {
+      const loginCodeResponse = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/send-login-code/${email}`
+      );
+
+      if (loginCodeResponse.status === 200) {
+        setIsLoginCodeSent(true);
+        const { message } = loginCodeResponse.data;
+        toast.success(message, {
+          position: "bottom-center",
+          theme: "colored",
+        });
+      }
+    } catch (error: any) {
+      console.error("error with sending login code: ", error);
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "Error sending login code. Please try again.";
+      toast.error(errorMessage, {
+        position: "bottom-center",
+        theme: "colored",
+      });
     }
-  }, [isLoggedIn]);
+  };
+
+  const googleLogin = async (credentialResponse: any) => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/google/users/callback`,
+        { userToken: credentialResponse.credential }
+      );
+
+      if (response.status === 200) {
+        setIsLoading(false);
+        setIsSuccess(true);
+        setIsLoggedIn(true);
+        setUser(response.data);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: response.data._id, name: response.data.name })
+        );
+      }
+    } catch (error: any) {
+      console.error("error with Google login: ", error);
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "Error with Google login. Please try again.";
+      toast.error(errorMessage, {
+        position: "bottom-center",
+        theme: "colored",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isLoggedIn && isSuccess && id) {
+      navigate(`/profile/${id}`);
+    }
+  }, [isLoggedIn, id, isSuccess]);
 
   useEffect(() => {
     if (!isLoggedIn && isLoginCodeSent) {
@@ -106,7 +175,12 @@ export const Login = () => {
         <Form onSubmit={(e: React.FormEvent<HTMLFormElement>) => loginUser(e)}>
           <BiLogIn size={35} />
           <Heading>Login</Heading>
-          <Button>Login with Google</Button>
+          <GoogleLogin
+            onSuccess={googleLogin}
+            onError={() => {
+              toast.error("Login failed", { position: "bottom-center" });
+            }}
+          />
           <Text>or</Text>
 
           <InputContainer>
@@ -114,7 +188,6 @@ export const Login = () => {
               type="email"
               placeholder="Email address or username"
               name="email"
-              required
               value={email}
               onChange={(e: React.FormEvent<HTMLInputElement>) =>
                 setEmail(e.currentTarget.value)

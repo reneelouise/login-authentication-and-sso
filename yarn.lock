@@ -2358,6 +2358,11 @@
     schema-utils "^3.0.0"
     source-map "^0.7.3"
 
+"@react-oauth/google@^0.12.1":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@react-oauth/google/-/google-0.12.1.tgz#b76432c3a525e9afe076f787d2ded003fcc1bee9"
+  integrity sha512-qagsy22t+7UdkYAiT5ZhfM4StXi9PPNvw0zuwNmabrWyMKddczMtBIOARflbaIj+wHiQjnMAsZmzsUYuXeyoSg==
+
 "@remix-run/router@1.13.1":
   version "1.13.1"
   resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.13.1.tgz#07e2a8006f23a3bc898b3f317e0a58cc8076b86e"
@@ -3262,6 +3267,19 @@ adjust-sourcemap-loader@^4.0.0:
   dependencies:
     loader-utils "^2.0.0"
     regex-parser "^2.2.11"
+
+ag-grid-community@~31.0.3:
+  version "31.0.3"
+  resolved "https://registry.yarnpkg.com/ag-grid-community/-/ag-grid-community-31.0.3.tgz#80870881a3be03aa5df890b4a70409ef5d781e7f"
+  integrity sha512-k81YmLaOQOab9BavYD+Pw2smZSl6TXOJqj9hRuf70XQl3EknOHCGcra7joJxZRJLMKE/HdR+u33TNyX4TCuWfg==
+
+ag-grid-react@^31.0.3:
+  version "31.0.3"
+  resolved "https://registry.yarnpkg.com/ag-grid-react/-/ag-grid-react-31.0.3.tgz#4f9634129f37bd59de34529d62dff158115ca225"
+  integrity sha512-CE4Z5Rdb0H3MFBhmge9854AyDvI4DoG7ZoUJRFB1p2pu5ANVe6tv7cwEI/ugHemEXRRP6s5uvW+ndv0Q6x1/+Q==
+  dependencies:
+    ag-grid-community "~31.0.3"
+    prop-types "^15.8.1"
 
 agent-base@6:
   version "6.0.2"
@@ -4449,6 +4467,11 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
+date-fns@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-3.3.1.tgz#7581daca0892d139736697717a168afbb908cfed"
+  integrity sha512-y8e109LYGgoQDveiEBD3DYXKba1jWf5BA8YU1FL5Tvm0BTdEfy54WLCwnuYWZNnzzvALy/QQ4Hov+Q9RVRv+Zw==
+
 debug@2.6.9, debug@^2.6.0:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
@@ -4727,11 +4750,6 @@ dotenv@^10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
   integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
-
-dotenv@^16.3.1:
-  version "16.3.1"
-  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.3.1.tgz#369034de7d7e5b120972693352a3bf112172cc3e"
-  integrity sha512-IPzF4w4/Rd94bA9imS68tZBaYyBWSCE47V1RGuMrB94iyTOIEwRmVL2x/4An+6mETpLrKJ5hQkB8W4kFAadeIQ==
 
 duplexer@^0.1.2:
   version "0.1.2"

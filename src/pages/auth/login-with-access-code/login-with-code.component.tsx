@@ -12,32 +12,47 @@ import {
   PlainButton,
 } from "./login-with-code.styles";
 import { toast } from "react-toastify";
+import { IUser } from "../../../helpers";
 
-export const LoginWithAccessCode = () => {
+interface LoginWithAccessCodeProps {
+  isLoggedIn: boolean;
+  setIsUserLoggedIn: React.Dispatch<React.SetStateAction<boolean>>;
+  setUser: React.Dispatch<React.SetStateAction<IUser>>;
+  email: string;
+  id: string;
+}
+
+export const LoginWithAccessCode = ({
+  isLoggedIn,
+  setIsUserLoggedIn,
+  setUser,
+  email,
+  id,
+}: LoginWithAccessCodeProps) => {
   const [loginCode, setLoginCode] = useState<string>("");
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const navigate = useNavigate();
 
-  const { email } = useParams();
-
   const sendLoginCode = async () => {
     try {
       const loginCodeResponse = await axios.post(
-        `http://localhost:5000/api/send-login-code/${email}`
+        `${process.env.REACT_APP_BACKEND_URL}/api/send-login-code/${email}`
       );
 
       if (loginCodeResponse.status === 200) {
-        toast.success("Login code resent successfully", {
+        toast.success(`Login code re-sent to ${email}`, {
           position: "bottom-center",
           theme: "colored",
           style: { width: "fit-content" },
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("error with sending login code: ", error);
-      toast.error("Error sending login code. Please try again.", {
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "Error sending login code. Please try again.";
+      toast.error(errorMessage, {
         position: "bottom-center",
         theme: "colored",
       });
@@ -50,22 +65,67 @@ export const LoginWithAccessCode = () => {
     try {
       setIsLoading(true);
       const response = await axios.post(
-        `http://localhost:5000/api/login-with-code/${email}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/login-with-code/${email}`,
         { loginCode }
       );
 
       if (response.status === 200) {
-        setIsLoggedIn(true);
-        setLoginCode("");
-        setIsLoading(false);
-        toast.success("Successfully logged in", {
+        setIsUserLoggedIn(true);
+        setUser(response.data);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: response.data._id, name: response.data.name})
+        );
+        toast.success("Successfully authenticated. Logging in", {
           position: "bottom-center",
           theme: "colored",
         });
       }
     } catch (error: any) {
-      console.error("Error logging in: ", error);
-      toast.error("Uh oh! Please check login code and try again.", {
+      console.error("There was a problem logging in: ", error);
+
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "There was a problem logging in";
+      toast.error(errorMessage, {
+        position: "bottom-center",
+        theme: "colored",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  
+  const loginWithGoogle = async (userToken: string, e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      setIsLoading(true);
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/google/users/callback`,
+        { loginCode }
+      );
+
+      if (response.status === 200) {
+        setIsUserLoggedIn(true);
+        setUser(response.data);
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ id: response.data._id, name: response.data.name})
+        );
+        toast.success("Successfully authenticated. Logging in", {
+          position: "bottom-center",
+          theme: "colored",
+        });
+      }
+    } catch (error: any) {
+      console.error("There was a problem logging in: ", error);
+
+      const errorMessage = error.response.data.message
+        ? error.response.data.message
+        : "There was a problem logging in";
+      toast.error(errorMessage, {
         position: "bottom-center",
         theme: "colored",
       });
@@ -74,11 +134,9 @@ export const LoginWithAccessCode = () => {
     }
   };
 
-  console.log("logged in: ", isLoggedIn);
-
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/profile");
+      navigate(`/profile/${id}`);
     }
   }, [isLoggedIn]);
 

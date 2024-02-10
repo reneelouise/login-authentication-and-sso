@@ -1,17 +1,19 @@
-import { ReactNode } from "react";
+
+import { ReactNode, memo } from "react";
 import { Navbar as Header } from "../navbar";
-// import { Footer } from "../footer";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-export const Layout = ({ children }: LayoutProps) => {
+
+// Memoize the Layout component
+export const Layout = memo(({ children}: LayoutProps) => {
   return (
-    <>
-      <Header />
-      <div style={{ padding: "24px" }}>{children}</div>
+    <>      <div style={{ padding: "24px" }}>{children}</div>
       {/* <Footer /> */}
     </>
   );
-};
+});
+
+

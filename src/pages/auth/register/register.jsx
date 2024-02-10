@@ -16,8 +16,10 @@ import { PasswordInputComponent } from "../../../components/password-input";
 import { PasswordStrength } from "../../../components/password-strength";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import {validateEmail} from '../../../helpers'
 import axios from "axios";
+
 
 export const Register = () => {
   const [name, setName] = useState("");
@@ -28,7 +30,7 @@ export const Register = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
-
+  
   const registerUser = async (e) => {
     e.preventDefault();
 
@@ -42,11 +44,6 @@ export const Register = () => {
       specialCharRegex.test(password) &&
       password.length >= 6;
 
-    const validateEmail = (email) => {
-      const validation = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-
-      return validation.test(email);
-    };
 
     if (!name || !email || !password) {
       toast.error(
@@ -89,7 +86,7 @@ export const Register = () => {
       setIsLoading(true);
 
       const response = await axios.post(
-        "http://localhost:5000/api/register",
+        `${process.env.REACT_APP_BACKEND_URL}/api/register`,
         userData
       );
 
@@ -113,7 +110,7 @@ export const Register = () => {
 
         // Call the endpoint to send the welcome email
         const welcomeEmailResponse = await axios.post(
-          "http://localhost:5000/api/send-automated-email",
+          `${process.env.REACT_APP_BACKEND_URL}/api/send-automated-email`,
           welcomeEmailData
         );
 
@@ -150,7 +147,6 @@ export const Register = () => {
       setIsLoading(false);
     }
 
-    console.log("user data: ", userData);
   };
 
   useEffect(() => {

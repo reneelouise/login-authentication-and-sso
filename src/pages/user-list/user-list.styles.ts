@@ -25,6 +25,7 @@ const TextAndSearchContainer = styled.div`
 
 const Input = styled.input`
   font-size: 18px;
+  width: 300px;
 `;
 
 const TableContainer = styled.div`

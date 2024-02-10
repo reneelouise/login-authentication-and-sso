@@ -1,5 +1,11 @@
 import { ReactNode } from "react";
-import { Container, TextContainer, Text, Value } from "./stats.styles";
+import {
+  Container,
+  TextContainer,
+  Text,
+  Value,
+  IconContainer,
+} from "./stats.styles";
 
 interface CardProps {
   icon: ReactNode;
@@ -11,7 +17,7 @@ interface CardProps {
 export const Card = ({ icon, heading, users, bgColor }: CardProps) => {
   return (
     <Container bgColor={bgColor}>
-      {icon}
+      <IconContainer>{icon}</IconContainer>
       <TextContainer>
         <Text>{heading}</Text>
         <Value>{users}</Value>

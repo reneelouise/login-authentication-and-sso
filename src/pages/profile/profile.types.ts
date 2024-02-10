@@ -3,7 +3,6 @@ export interface ProfileProps {
   email: string;
   phone: string;
   bio: string;
-  photo: string;
-  role: string;
-  isVerified: boolean;
+  photo: string|null;
+  role?: string;
 }
